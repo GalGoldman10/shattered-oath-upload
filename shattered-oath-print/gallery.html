@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shattered Oath — Card Gallery</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Georgia, serif; background: #0a0a0f; color: #e8e4dc; }
+    header {
+      text-align: center; padding: 2rem 1rem;
+      border-bottom: 1px solid #3a3a48;
+      background: linear-gradient(180deg, #12121a, #0a0a0f);
+    }
+    h1 { font-size: 2rem; letter-spacing: 0.2em; color: #9a7b3c; text-transform: uppercase; }
+    p { color: #9a968a; margin-top: 0.5rem; }
+    nav {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+      padding: 1rem; position: sticky; top: 0;
+      background: rgba(10,10,15,0.97); z-index: 10; border-bottom: 1px solid #3a3a48;
+    }
+    nav button {
+      background: #1a1a24; border: 1px solid #6b5a32; color: #e8e4dc;
+      padding: 0.45rem 1rem; cursor: pointer; font-family: inherit;
+      font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    nav button.active, nav button:hover { background: #5c2030; border-color: #9a7b3c; }
+    section { padding: 1.5rem; display: none; }
+    section.active { display: block; }
+    .section-title {
+      font-size: 1rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: #9a7b3c; margin-bottom: 1.25rem; text-align: center;
+    }
+    .grid { display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: center; }
+    .card-wrap { text-align: center; width: 220px; }
+    .card-wrap img {
+      width: 220px; height: 308px; object-fit: contain;
+      border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      background: #0a0a0f; transition: transform 0.2s;
+    }
+    .card-wrap:hover img { transform: scale(1.04); }
+    .label { margin-top: 0.4rem; font-size: 0.65rem; color: #6a665c; }
+    .featured {
+      display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
+      padding: 2rem 1rem; border-bottom: 1px solid #3a3a48;
+    }
+    .featured img { width: 200px; height: 280px; box-shadow: 0 8px 28px rgba(154,123,60,0.15); }
+    .hint { text-align: center; padding: 0.75rem; color: #6a665c; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Shattered Oath</h1>
+    <p>All 101 printable card designs</p>
+  </header>
+  <p class="hint">Click any card to open full size</p>
+  <div class="featured" id="featured"></div>
+  <nav id="nav"></nav>
+  <div id="sections"></div>
+  <script>
+    const FILES = [
+      "champion-serath-ironwall-ch-vanguard-01.svg","champion-garrick-stonehelm-ch-vanguard-02.svg",
+      "champion-mira-thornshield-ch-vanguard-03.svg","champion-dorn-the-unbroken-ch-vanguard-04.svg",
+      "champion-kael-bloodmark-ch-ravager-01.svg","champion-vexa-skullcleaver-ch-ravager-02.svg",
+      "champion-ruhn-ashfang-ch-ravager-03.svg","champion-morvain-the-reaper-ch-ravager-04.svg",
+      "champion-elira-voidweaver-ch-arcanist-01.svg","champion-thalen-runebinder-ch-arcanist-02.svg",
+      "champion-sylra-embermind-ch-arcanist-03.svg","champion-archivist-malven-ch-arcanist-04.svg",
+      "champion-nyx-shadowveil-ch-stalker-01.svg","champion-corbin-nightblade-ch-stalker-02.svg",
+      "champion-isara-mistwalker-ch-stalker-03.svg","champion-the-pale-huntress-ch-stalker-04.svg",
+      "champion-liora-dawnkeeper-ch-warden-01.svg","champion-brother-aldric-ch-warden-02.svg",
+      "champion-selene-veilborn-ch-warden-03.svg","champion-high-matron-vesper-ch-warden-04.svg",
+      "champion-malachar-the-hollow-ch-occultist-01.svg","champion-vera-soulbinder-ch-occultist-02.svg",
+      "champion-drex-the-unbound-ch-occultist-03.svg","champion-the-veiled-oracle-ch-occultist-04.svg",
+      "equipment-obsidian-cleaver-eq-weapon-01.svg","equipment-whisperfang-dagger-eq-weapon-02.svg",
+      "equipment-stormcaller-staff-eq-weapon-03.svg","equipment-soulreaper-glaive-eq-weapon-04.svg",
+      "equipment-ironbane-mace-eq-weapon-05.svg","equipment-gravecaller-bow-eq-weapon-06.svg",
+      "equipment-graveplate-cuirass-eq-armor-01.svg","equipment-shadowweave-cloak-eq-armor-02.svg",
+      "equipment-berserker-hide-eq-armor-03.svg","equipment-aegis-of-the-fallen-eq-armor-04.svg",
+      "equipment-shard-of-the-broken-crown-eq-relic-01.svg","equipment-echoing-hourglass-eq-relic-02.svg",
+      "equipment-bloodstone-amulet-eq-relic-03.svg","equipment-reliquary-of-ash-eq-relic-04.svg",
+      "equipment-wolfbone-talisman-eq-charm-01.svg","equipment-sigil-of-warding-eq-charm-02.svg",
+      "equipment-hexshard-pendant-eq-charm-03.svg","equipment-oathbreaker-s-seal-eq-charm-04.svg",
+      "equipment-mistveil-band-eq-charm-05.svg",
+      "tactic-ruin-strike-tc-01.svg","tactic-scout-the-depths-tc-02.svg","tactic-sanctified-mending-tc-03.svg",
+      "tactic-iron-resolve-tc-04.svg","tactic-sabotage-tc-05.svg","tactic-war-cry-tc-06.svg",
+      "tactic-relic-shift-tc-07.svg","tactic-blood-tithe-tc-08.svg","tactic-royal-decree-tc-09.svg",
+      "tactic-rally-the-line-tc-10.svg","tactic-void-lash-tc-11.svg","tactic-fortify-tc-12.svg",
+      "tactic-grave-robbing-tc-13.svg","tactic-assassin-s-mark-tc-14.svg","tactic-emergency-rations-tc-15.svg",
+      "tactic-dark-bargain-tc-16.svg","tactic-shatter-weapon-tc-17.svg","tactic-banner-of-conquest-tc-18.svg",
+      "tactic-smoke-veil-tc-19.svg","tactic-chain-lightning-tc-20.svg","tactic-forced-march-tc-21.svg",
+      "tactic-cursed-ground-tc-22.svg","tactic-last-rites-tc-23.svg","tactic-oath-of-vengeance-tc-24.svg",
+      "reaction-parrying-stance-rx-01.svg","reaction-counterspell-rx-02.svg","reaction-bodyguard-rx-03.svg",
+      "reaction-aegis-flash-rx-04.svg","reaction-disrupt-ritual-rx-05.svg","reaction-retaliation-rx-06.svg",
+      "reaction-mirror-trap-rx-07.svg","reaction-sanctuary-ward-rx-08.svg","reaction-desperate-block-rx-09.svg",
+      "reaction-null-sigil-rx-10.svg","reaction-shadow-step-rx-11.svg","reaction-blood-shield-rx-12.svg",
+      "monster-ash-wraith-mn-01.svg","monster-ironfang-boar-mn-02.svg","monster-crypt-stalker-mn-03.svg",
+      "monster-blight-hydra-mn-04.svg","monster-obsidian-golem-mn-05.svg","monster-dread-knight-mn-06.svg",
+      "monster-void-serpent-mn-07.svg","monster-corrupted-archon-mn-08.svg","monster-plague-swarm-mn-09.svg",
+      "monster-throne-guardian-mn-10.svg",
+      "objective-united-front-ob-01.svg","objective-flawless-hunt-ob-02.svg","objective-arsenal-of-war-ob-03.svg",
+      "objective-master-tactician-ob-04.svg","objective-slayer-s-mark-ob-05.svg","objective-vanguard-s-oath-ob-06.svg",
+      "objective-whispers-of-renown-ob-07.svg","objective-arcanist-s-thesis-ob-08.svg","objective-stalker-s-contract-ob-09.svg",
+      "objective-occult-bargain-ob-10.svg","objective-warden-s-vigil-ob-11.svg","objective-the-shattered-oath-ob-12.svg",
+    ];
+
+    const CATS = {
+      Champions: f => f.startsWith('champion-'),
+      Equipment: f => f.startsWith('equipment-'),
+      Tactics: f => f.startsWith('tactic-'),
+      Reactions: f => f.startsWith('reaction-'),
+      Monsters: f => f.startsWith('monster-'),
+      Objectives: f => f.startsWith('objective-'),
+    };
+
+    function card(path) {
+      const name = path.replace('.svg','').replace(/-/g,' ');
+      return `<div class="card-wrap"><a href="cards/${path}" target="_blank"><img src="cards/${path}" alt="${name}" loading="lazy"/></a><div class="label">${name}</div></div>`;
+    }
+
+    const highlights = [
+      'champion-serath-ironwall-ch-vanguard-01.svg',
+      'champion-morvain-the-reaper-ch-ravager-04.svg',
+      'champion-the-veiled-oracle-ch-occultist-04.svg',
+      'monster-dread-knight-mn-06.svg',
+      'card-back.svg',
+    ];
+    document.getElementById('featured').innerHTML = highlights.map(f => {
+      const src = f === 'card-back.svg' ? f : 'cards/' + f;
+      return `<div class="card-wrap"><a href="${src}" target="_blank"><img src="${src}" alt=""/></a></div>`;
+    }).join('');
+
+    const nav = document.getElementById('nav');
+    const sections = document.getElementById('sections');
+    Object.entries(CATS).forEach(([name, filter], i) => {
+      const files = FILES.filter(filter);
+      nav.innerHTML += `<button type="button" data-cat="${name}" class="${i===0?'active':''}">${name} (${files.length})</button>`;
+      sections.innerHTML += `<section id="cat-${name}" class="${i===0?'active':''}"><div class="section-title">${name}</div><div class="grid">${files.map(card).join('')}</div></section>`;
+    });
+
+    nav.addEventListener('click', e => {
+      if (e.target.tagName !== 'BUTTON') return;
+      nav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById('cat-' + e.target.dataset.cat).classList.add('active');
+    });
+  </script>
+</body>
+</html>

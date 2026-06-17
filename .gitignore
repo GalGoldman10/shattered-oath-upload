@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated card SVGs — rebuilt in GitHub Actions before deploy
+shattered-oath-print/output/

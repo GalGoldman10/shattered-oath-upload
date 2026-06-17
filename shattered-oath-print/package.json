@@ -1,0 +1,13 @@
+{
+  "name": "shattered-oath-print",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Printable card designs for Shattered Oath board game",
+  "type": "module",
+  "scripts": {
+    "generate": "tsx scripts/generate-cards.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
